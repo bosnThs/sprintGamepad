@@ -1,7 +1,7 @@
-//#include "Hooks.h"
 #include <SimpleIni.h>
 
 float minAxisValue;
+bool  disableMounted;
 
 void loadIni()
 {
@@ -10,9 +10,12 @@ void loadIni()
 	ini.LoadFile(L"Data\\SKSE\\Plugins\\sprintGamepad.ini");
 
 	minAxisValue = (float)ini.GetDoubleValue("settings", "fAxisSprintingMin", 0.1f);
+	disableMounted = (bool)ini.GetBoolValue("settings", "bDisableWhileMounted", false);
 
-	if (minAxisValue < 0.0f || minAxisValue > 1.0f)
+	if (minAxisValue < 0.0f)
 		minAxisValue = 0.1f;
+	if (minAxisValue > 1.0f)
+		minAxisValue = 1.0f;
 }
 
 struct Hooks
@@ -27,7 +30,11 @@ struct Hooks
 	{
 		_ProcessThumbstick(a_this, a_event, a_data);
 
-		if (RE::PlayerCharacter::GetSingleton()->AsActorState()->IsSprinting()) {
+		auto player = RE::PlayerCharacter::GetSingleton();
+		if (player->IsOnMount() && disableMounted)
+			return;
+
+		if (player->AsActorState()->IsSprinting()) {
 
 			if (abs(a_data->moveInputVec.x) > minAxisValue)
 				a_data->moveInputVec.x = 1.0f * (a_data->moveInputVec.x / abs(a_data->moveInputVec.x));
