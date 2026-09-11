@@ -21,12 +21,14 @@ add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
 add_requires("simpleini")
+add_requires("imgui")
 
 -- targets
 target("sprintGamepad")
     -- add dependencies to target
     add_deps("commonlibsse-ng")
     add_packages("simpleini")
+    add_packages("imgui")
 
     -- add commonlibsse-ng plugin
     add_rules("commonlibsse-ng.plugin", {
